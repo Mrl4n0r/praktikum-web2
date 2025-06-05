@@ -5,7 +5,7 @@
   <div class="card-body">
     <form action="?page=matakuliah-show" method="POST">
       <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Masukkan kode atau nama mata kuliah..." name="keyword">
+        <input type="text" class="form-control" placeholder="Masukkan kode atau nama mata kuliah..." name="keyword" value="<?php echo isset($_POST['keyword']) ? $_POST['keyword'] : ''; ?>">
         <div class="input-group-append">
           <button class="btn btn-primary" type="submit" name="search">Cari!</button>
         </div>
@@ -17,11 +17,27 @@
 
     <div class="table-responsive">
       <table class="table table-sm table-bordered table-hover m-0">
+
         <?php
         $limit = 5;
-        $page = isset($_GET["halaman"]) ? (int) $_GET["halaman"] : 1;
+        $page = isset($_GET["halaman"]) ? (int)$_GET["halaman"] : 1;
         $mulai = ($page > 1) ? ($page * $limit) - $limit : 0;
-        $query = mysqli_query($con, "SELECT * FROM matakuliah LIMIT $mulai, $limit") or die(mysqli_error($con));
+
+        // Buat klausa WHERE jika pencarian dilakukan
+        $whereClause = "";
+        if (isset($_POST['search'])) {
+          $keyword = trim($_POST['keyword']);
+          if (!empty($keyword)) {
+            $whereClause = "WHERE kode LIKE '%$keyword%' OR nama LIKE '%$keyword%'";
+          }
+        }
+
+        // Hitung total data untuk paginasi
+        $result = mysqli_query($con, "SELECT * FROM matakuliah $whereClause");
+        $total_records = mysqli_num_rows($result);
+
+        // Ambil data sesuai halaman dan pencarian
+        $query = mysqli_query($con, "SELECT * FROM matakuliah $whereClause LIMIT $mulai, $limit") or die(mysqli_error($con));
         ?>
 
         <thead>
@@ -36,13 +52,6 @@
         </thead>
         <tbody>
           <?php
-          if (isset($_POST['search'])) {
-            $keyword = trim($_POST['keyword']);
-            if (!empty($keyword)) {
-              $query = mysqli_query($con, "SELECT * FROM matakuliah WHERE kode LIKE '%$keyword%' OR nama LIKE '%$keyword%'");
-            }
-          }
-
           $no = $mulai + 1;
           while ($data = mysqli_fetch_array($query)) {
           ?>
@@ -62,10 +71,6 @@
       </table>
     </div>
 
-    <?php
-    $result = mysqli_query($con, "SELECT * FROM matakuliah");
-    $total_records = mysqli_num_rows($result);
-    ?>
     <p>Jumlah Data: <?php echo $total_records; ?></p>
 
     <nav class="mb-5">
