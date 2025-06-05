@@ -33,4 +33,19 @@ while ($data = mysqli_fetch_array($result)) {
                         <input type="number" class="form-control" name="sks" value="<?php echo $sks; ?>" required>
                     </div>
                     <div class="form-group">
-                        <label for="semes
+                        <label for="semester" class="control-label">Semester</label>
+                        <input type="number" class="form-control" name="semester" value="<?php echo $semester; ?>" required>
+                    </div>
+                    <!-- Hidden ID untuk proses update -->
+                    <input type="hidden" name="id" value="<?php echo $id; ?>">
+
+                    <!-- Tombol Simpan -->
+                    <div class="form-group">
+                        <input type="submit" name="update" class="btn btn-primary" value="Simpan">
+                        <input type="reset" class="btn btn-warning" value="Reset">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
